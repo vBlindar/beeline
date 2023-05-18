@@ -6,6 +6,8 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -33,6 +35,12 @@ public class Main {
             newPlace.setCities_count(newPlace.getCities().size());
             nn.add(newPlace);
         });
+        nn.forEach(newPlace -> {
+            List<String> cities = newPlace.getCities();
+            Collections.sort(cities);
+            newPlace.setCities(cities);
+        });
+
         Student student = new Student("Vlad Blindar",557809309,"github.com/vBlindar");
         Result result = new Result(student,nn);
 
