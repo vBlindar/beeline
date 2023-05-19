@@ -6,7 +6,6 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -25,26 +24,27 @@ public class Main {
     
     public static void parseNew(List<Place> places) throws Exception {
         var str = places.stream().collect(Collectors.groupingBy(Place::getCountry));
-        List<NewPlace> nn = new ArrayList<>();
-        str.forEach((k,v)->{
-            var newPlace = new NewPlace();
-            newPlace.setCountry(k);
-            v.forEach(vv -> {
-                newPlace.addToList(vv.getCity());
-            });
-            newPlace.setCities_count(newPlace.getCities().size());
-            nn.add(newPlace);
-        });
-        nn.forEach(newPlace -> {
-            List<String> cities = newPlace.getCities();
-            Collections.sort(cities);
-            newPlace.setCities(cities);
-        });
+        var nn = places.stream()
+                .collect(Collectors.groupingBy(Place::getCountry))
+                .entrySet().stream()
+                .map(entry -> {
+                    var newPlace = new NewPlace();
+                    newPlace.setCountry(entry.getKey());
+                    var cities = entry.getValue().stream()
+                            .map(Place::getCity)
+                            .sorted()
+                            .collect(Collectors.toList());
+                    newPlace.setCities(cities);
+                    newPlace.setCities_count(cities.size());
+                    return newPlace;
+                })
+                .collect(Collectors.toList());
 
         Student student = new Student("Vlad Blindar",557809309,"github.com/vBlindar");
         Result result = new Result(student,nn);
+        System.out.println(result);
 
-        sendPostRequest(Service.toJson(result));
+//        sendPostRequest(Service.toJson(result));
     }
 
     public static String getJson(String urlString) throws Exception {
